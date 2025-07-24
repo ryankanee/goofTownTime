@@ -18,17 +18,32 @@ async function getRedisClient() {
 export async function GET() {
   try {
     const client = await getRedisClient();
-    const customTime = await client.get("customTime");
+    const timeOffsetData = await client.get("timeOffset");
+
+    if (timeOffsetData) {
+      const { offsetMs, setAtRealTime } = JSON.parse(timeOffsetData);
+      const currentRealTime = Date.now();
+      const elapsedSinceSet = currentRealTime - setAtRealTime;
+      const currentCustomTime = new Date(offsetMs + currentRealTime);
+
+      return Response.json({
+        customTime: currentCustomTime.toISOString(),
+        hasCustomTime: true,
+        offset: offsetMs,
+      });
+    }
 
     return Response.json({
-      customTime: customTime,
-      hasCustomTime: customTime !== null,
+      customTime: null,
+      hasCustomTime: false,
+      offset: 0,
     });
   } catch (error) {
     console.error("Error fetching custom time from Redis:", error);
     return Response.json({
       customTime: null,
       hasCustomTime: false,
+      offset: 0,
     });
   }
 }
@@ -61,15 +76,25 @@ export async function POST(request) {
     const today = new Date();
     today.setHours(hours, minutes, 0, 0); // Set hours, minutes, seconds=0, milliseconds=0
 
-    const customTimeString = today.toISOString();
+    const customTimeMs = today.getTime();
+    const currentRealTimeMs = Date.now();
 
-    // Store in Redis
+    // Calculate the offset between the desired custom time and real time
+    const offsetMs = customTimeMs - currentRealTimeMs;
+
+    // Store the offset and when it was set in Redis
+    const timeOffsetData = {
+      offsetMs,
+      setAtRealTime: currentRealTimeMs,
+    };
+
     const client = await getRedisClient();
-    await client.set("customTime", customTimeString);
+    await client.set("timeOffset", JSON.stringify(timeOffsetData));
 
     return Response.json({
       success: true,
-      customTime: customTimeString,
+      customTime: today.toISOString(),
+      offset: offsetMs,
     });
   } catch (error) {
     console.error("Error setting custom time in Redis:", error);
@@ -83,7 +108,7 @@ export async function POST(request) {
 export async function DELETE() {
   try {
     const client = await getRedisClient();
-    await client.del("customTime");
+    await client.del("timeOffset");
     return Response.json({ success: true, message: "Custom time cleared" });
   } catch (error) {
     console.error("Error deleting custom time from Redis:", error);

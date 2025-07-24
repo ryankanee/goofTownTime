@@ -4,52 +4,47 @@ import { useEffect, useState } from "react";
 export default function Clock() {
   const [time, setTime] = useState(new Date());
   const [hasMounted, setHasMounted] = useState(false);
+  const [timeOffset, setTimeOffset] = useState(0);
   const [isCustomTime, setIsCustomTime] = useState(false);
 
   useEffect(() => {
     setHasMounted(true);
 
-    const fetchTime = async () => {
+    const fetchTimeOffset = async () => {
       try {
         const response = await fetch("/api/admin-time");
         const data = await response.json();
 
         if (data.hasCustomTime) {
-          setTime(new Date(data.customTime));
+          setTimeOffset(data.offset);
           setIsCustomTime(true);
         } else {
-          setTime(new Date());
+          setTimeOffset(0);
           setIsCustomTime(false);
         }
       } catch (error) {
-        console.error("Error fetching time:", error);
-        setTime(new Date());
+        console.error("Error fetching time offset:", error);
+        setTimeOffset(0);
         setIsCustomTime(false);
       }
     };
 
-    fetchTime();
+    fetchTimeOffset();
 
-    // Set up interval to check for custom time updates every 5 seconds
-    const timeCheckInterval = setInterval(fetchTime, 5000);
+    // Check for offset updates every 5 seconds
+    const offsetCheckInterval = setInterval(fetchTimeOffset, 5000);
 
-    // Only update real time if not using custom time
-    let realTimeInterval;
-    if (!isCustomTime) {
-      realTimeInterval = setInterval(() => {
-        if (!isCustomTime) {
-          setTime(new Date());
-        }
-      }, 1000);
-    }
+    // Update time every second (either real time or offset time)
+    const timeUpdateInterval = setInterval(() => {
+      const currentTime = new Date(Date.now() + timeOffset);
+      setTime(currentTime);
+    }, 1000);
 
     return () => {
-      clearInterval(timeCheckInterval);
-      if (realTimeInterval) {
-        clearInterval(realTimeInterval);
-      }
+      clearInterval(offsetCheckInterval);
+      clearInterval(timeUpdateInterval);
     };
-  }, [isCustomTime]);
+  }, [timeOffset]);
 
   if (!hasMounted) return null;
 

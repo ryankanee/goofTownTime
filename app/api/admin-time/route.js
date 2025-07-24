@@ -1,15 +1,31 @@
-import { kv } from "@vercel/kv";
+import { createClient } from "redis";
+
+// Create Redis client
+const redis = createClient({
+  url: process.env.REDIS_URL || process.env.KV_URL,
+});
+
+// Connect to Redis
+redis.on("error", (err) => console.log("Redis Client Error", err));
+
+async function getRedisClient() {
+  if (!redis.isOpen) {
+    await redis.connect();
+  }
+  return redis;
+}
 
 export async function GET() {
   try {
-    const customTime = await kv.get("customTime");
+    const client = await getRedisClient();
+    const customTime = await client.get("customTime");
 
     return Response.json({
       customTime: customTime,
       hasCustomTime: customTime !== null,
     });
   } catch (error) {
-    console.error("Error fetching custom time from KV:", error);
+    console.error("Error fetching custom time from Redis:", error);
     return Response.json({
       customTime: null,
       hasCustomTime: false,
@@ -47,15 +63,16 @@ export async function POST(request) {
 
     const customTimeString = today.toISOString();
 
-    // Store in Vercel KV
-    await kv.set("customTime", customTimeString);
+    // Store in Redis
+    const client = await getRedisClient();
+    await client.set("customTime", customTimeString);
 
     return Response.json({
       success: true,
       customTime: customTimeString,
     });
   } catch (error) {
-    console.error("Error setting custom time in KV:", error);
+    console.error("Error setting custom time in Redis:", error);
     return Response.json(
       { error: "Failed to set custom time" },
       { status: 500 },
@@ -65,10 +82,11 @@ export async function POST(request) {
 
 export async function DELETE() {
   try {
-    await kv.del("customTime");
+    const client = await getRedisClient();
+    await client.del("customTime");
     return Response.json({ success: true, message: "Custom time cleared" });
   } catch (error) {
-    console.error("Error deleting custom time from KV:", error);
+    console.error("Error deleting custom time from Redis:", error);
     return Response.json(
       { error: "Failed to clear custom time" },
       { status: 500 },

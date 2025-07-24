@@ -6,9 +6,18 @@ export default function Clock() {
   const [hasMounted, setHasMounted] = useState(false);
   const [timeOffset, setTimeOffset] = useState(0);
   const [isCustomTime, setIsCustomTime] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setHasMounted(true);
+
+    // Check if mobile on mount and resize
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
 
     const fetchTimeOffset = async () => {
       try {
@@ -43,6 +52,7 @@ export default function Clock() {
     return () => {
       clearInterval(offsetCheckInterval);
       clearInterval(timeUpdateInterval);
+      window.removeEventListener("resize", checkMobile);
     };
   }, [timeOffset]);
 
@@ -64,9 +74,8 @@ export default function Clock() {
       <div className="clock">
         {numbers.map((num) => {
           const angle = (num - 3) * 30 * (Math.PI / 180); // rotate for clock alignment
-          const radius = 85;
+          const radius = isMobile ? 60 : 85; // Responsive radius
           const x = radius * Math.cos(angle);
-
           const y = radius * Math.sin(angle);
 
           const isLabel = num === 11 || num === 3;

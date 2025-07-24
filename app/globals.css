@@ -1,20 +1,65 @@
 @import url("https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Engagement&family=Shrikhand&display=swap");
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+main h1 {
+  text-align: center;
+  font-family: Cormorant;
+  font-weight: 700;
+  margin-bottom: 20px;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
 .clock-container {
   border: black 35px solid;
-  width: 500px;
-  height: 600px;
+  width: min(500px, 90vw);
+  height: min(600px, 80vh);
+  max-width: 500px;
   display: flex;
   align-items: center;
   flex-direction: column;
   justify-content: space-between;
+  box-sizing: border-box;
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  main {
+    padding: 10px;
+  }
+
+  .clock-container {
+    border-width: 20px;
+    width: min(400px, 95vw);
+    height: min(500px, 85vh);
+  }
 }
 .clock {
-  width: 200px;
-  height: 200px;
+  width: min(200px, 40vw);
+  height: min(200px, 40vw);
   border: 8px solid rgba(255, 255, 255, 0);
   border-radius: 50%;
   position: relative;
   margin: 40px auto;
+  max-width: 200px;
+  max-height: 200px;
+}
+
+/* Mobile adjustments for clock */
+@media (max-width: 768px) {
+  .clock {
+    width: min(150px, 35vw);
+    height: min(150px, 35vw);
+    margin: 20px auto;
+  }
 }
 
 .hand {
@@ -58,17 +103,28 @@
   font-family: Shrikhand;
   position: absolute;
   transform: translate(-50%, -50%);
-  font-size: 2.5rem;
-  /* font-weight: 900; */
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
   color: #000;
 }
 
 .tick {
   position: absolute;
   width: 4px;
-  height: 30px;
+  height: clamp(20px, 5vw, 30px);
   background: #000;
   transform-origin: center bottom;
+}
+
+/* Mobile adjustments for clock elements */
+@media (max-width: 768px) {
+  .number {
+    font-size: clamp(1.2rem, 3.5vw, 2rem);
+  }
+
+  .tick {
+    width: 3px;
+    height: clamp(15px, 4vw, 25px);
+  }
 }
 
 .bottom-section {
@@ -78,16 +134,38 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 .slop-text {
   color: white;
   font-family: "Engagement", cursive;
   font-weight: 400;
   font-style: normal;
-  font-size: 90px;
+  font-size: clamp(2rem, 6vw, 60px);
+  text-align: center;
+  line-height: 1;
+  max-width: 100%;
+  word-wrap: break-word;
 }
 
 .clock-header {
   font-family: Cormorant;
-  font-weight: 1000px;
+  font-weight: 700;
+  text-align: center;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  margin: 10px 0;
+}
+
+/* Mobile adjustments for text */
+@media (max-width: 768px) {
+  .slop-text {
+    font-size: clamp(1.5rem, 5vw, 3rem);
+  }
+
+  .clock-header {
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    margin: 5px 0;
+  }
 }

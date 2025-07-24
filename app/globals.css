@@ -161,7 +161,7 @@ main h1 {
 /* Mobile adjustments for text */
 @media (max-width: 768px) {
   .slop-text {
-    font-size: clamp(1.5rem, 5vw, 3rem);
+    font-size: clamp(2rem, 6vw, 60px);
   }
 
   .clock-header {

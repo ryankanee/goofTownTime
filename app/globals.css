@@ -1,42 +1,93 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@import url("https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,300..700;1,300..700&family=Engagement&family=Shrikhand&display=swap");
+.clock-container {
+  border: black 35px solid;
+  width: 500px;
+  height: 600px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.clock {
+  width: 200px;
+  height: 200px;
+  border: 8px solid rgba(255, 255, 255, 0);
+  border-radius: 50%;
+  position: relative;
+  margin: 40px auto;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.hand {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform-origin: bottom;
+  background: #333;
+  transform: rotate(0deg);
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+.hand.hour {
+  height: 50px;
+  width: 6px;
+  background: #333;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.hand.minute {
+  height: 70px;
+  width: 4px;
+  background: #666;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+.hand.second {
+  height: 90px;
+  width: 2px;
+  background: red;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.center {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #333;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.number {
+  font-family: Shrikhand;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-size: 2.5rem;
+  /* font-weight: 900; */
+  color: #000;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.tick {
+  position: absolute;
+  width: 4px;
+  height: 30px;
+  background: #000;
+  transform-origin: center bottom;
+}
+
+.bottom-section {
+  background-color: red;
+  height: calc(100% / 4);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slop-text {
+  color: white;
+  font-family: "Engagement", cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 90px;
+}
+
+.clock-header {
+  font-family: Cormorant;
+  font-weight: 1000px;
 }
